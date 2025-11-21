@@ -12,7 +12,7 @@
       </button>
     </header>
 
-    <!-- SEARCH & SORT -->
+    <!-- SEARCH & SORT CONTROLS -->
     <div v-if="!isCartVisible" class="controls">
       <input 
         v-model="searchQuery"
@@ -81,15 +81,32 @@
           </button>
         </div>
 
-        <!-- NEW: Cart Summary -->
+        <!-- Cart Summary -->
         <div class="cart-summary">
           <p><strong>Total Items:</strong> {{ cart.length }}</p>
           <p><strong>Total Price:</strong> £{{ totalPrice.toFixed(2) }}</p>
         </div>
+
+        <!-- NEW: Checkout Form -->
+        <div class="checkout-form">
+          <h3>Checkout</h3>
+          <div class="form-group">
+            <label for="name">Name:</label>
+            <input id="name" type="text" v-model="checkoutName" placeholder="Your Name" />
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone:</label>
+            <input id="phone" type="tel" v-model="checkoutPhone" placeholder="Your Phone" />
+          </div>
+
+          <button class="checkout-btn" :disabled="cart.length === 0 || !checkoutName || !checkoutPhone">
+            Submit Order
+          </button>
+        </div>
+
       </div>
 
       <p v-else>Your cart is empty.</p>
-
     </main>
   </div>
 </template>
@@ -114,7 +131,7 @@ const lessons = ref([
 const cart = ref([]);
 const isCartVisible = ref(false);
 
-// SEARCH & SORT STATE
+// SEARCH & SORT
 const searchQuery = ref("");
 const sortBy = ref("subject");
 const sortOrder = ref("asc");
@@ -133,10 +150,8 @@ const sortedAndFilteredLessons = computed(() => {
   return [...filteredLessons.value].sort((a, b) => {
     let valA = a[sortBy.value];
     let valB = b[sortBy.value];
-
     if (typeof valA === "string") valA = valA.toLowerCase();
     if (typeof valB === "string") valB = valB.toLowerCase();
-
     if (valA < valB) return sortOrder.value === "asc" ? -1 : 1;
     if (valA > valB) return sortOrder.value === "asc" ? 1 : -1;
     return 0;
@@ -146,7 +161,6 @@ const sortedAndFilteredLessons = computed(() => {
 // ADD TO CART
 function addToCart(lesson) {
   if (lesson.spaces === 0) return;
-
   lesson.spaces--;
   cart.value.push({
     subject: lesson.subject,
@@ -164,10 +178,14 @@ function removeFromCart(index) {
   if (lesson) lesson.spaces++;
 }
 
-// NEW: Total price computed
+// CART TOTAL
 const totalPrice = computed(() => {
   return cart.value.reduce((sum, item) => sum + item.price, 0);
 });
+
+// CHECKOUT FORM
+const checkoutName = ref("");
+const checkoutPhone = ref("");
 </script>
 
 <style scoped>
@@ -184,4 +202,9 @@ h2 { border-bottom: 2px solid #4CAF50; padding-bottom: 5px; margin-bottom: 20px;
 .add-to-cart-button { padding: 8px; background-color: #007bff; color: white; border: none; border-radius: 5px; }
 .add-to-cart-button[disabled] { background-color: #ccc; }
 .cart-summary { margin-top: 15px; padding: 10px; border-top: 1px solid #bbb; font-weight: bold; }
+.checkout-form { margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 6px; }
+.checkout-form h3 { margin-bottom: 10px; }
+.form-group { margin-bottom: 10px; }
+.checkout-btn { padding: 8px 12px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+.checkout-btn:disabled { background-color: #aaa; cursor: not-allowed; }
 </style>
