@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <header class="app-header">
-      <h1>Lesson Store</h1>
+      <h1>Extra Class Lesson</h1>
 
       <!-- Toggle between Lessons and Cart -->
       <button 
@@ -13,14 +13,27 @@
       </button>
     </header>
 
-    <!-- SEARCH BAR (NEW FOR COMMIT 3) -->
-    <div v-if="!isCartVisible" class="search-bar">
+    <!-- SEARCH & SORT CONTROLS -->
+    <div v-if="!isCartVisible" class="controls">
       <input 
         v-model="searchQuery"
         type="text"
         placeholder="Search by subject or location..."
         class="search-input"
       />
+
+      <div class="sort-controls">
+        <label for="sort-by">Sort by:</label>
+        <select id="sort-by" v-model="sortBy">
+          <option value="subject">Subject</option>
+          <option value="price">Price</option>
+          <option value="spaces">Spaces</option>
+        </select>
+
+        <button @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'">
+          {{ sortOrder === 'asc' ? 'Asc' : 'Desc' }}
+        </button>
+      </div>
     </div>
 
     <!-- LESSONS VIEW -->
@@ -28,7 +41,7 @@
       <div class="lesson-list">
 
         <div 
-          v-for="lesson in filteredLessons" 
+          v-for="lesson in sortedAndFilteredLessons" 
           :key="lesson.id" 
           class="lesson-card"
         >
@@ -81,7 +94,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 
-// UPDATED LESSON DATA
+// LESSON DATA
 const lessons = ref([
   { id: 1, subject: "Math", location: "Room 101, Main Building, London", price: 15, spaces: 5, icon: "📐" },
   { id: 2, subject: "English", location: "Library Annex, Kensington", price: 12.5, spaces: 5, icon: "📚" },
@@ -98,18 +111,33 @@ const lessons = ref([
 const cart = ref([]);
 const isCartVisible = ref(false);
 
-// NEW: Search Query
+// SEARCH & SORT STATE
 const searchQuery = ref("");
+const sortBy = ref("subject");
+const sortOrder = ref("asc");
 
-// NEW: Computed filtered lessons
+// FILTERED LESSONS
 const filteredLessons = computed(() => {
   const query = searchQuery.value.toLowerCase();
+  return lessons.value.filter(lesson => 
+    lesson.subject.toLowerCase().includes(query) ||
+    lesson.location.toLowerCase().includes(query)
+  );
+});
 
-  return lessons.value.filter((lesson) => {
-    return (
-      lesson.subject.toLowerCase().includes(query) ||
-      lesson.location.toLowerCase().includes(query)
-    );
+// SORTED AND FILTERED LESSONS
+const sortedAndFilteredLessons = computed(() => {
+  return [...filteredLessons.value].sort((a, b) => {
+    let valA = a[sortBy.value];
+    let valB = b[sortBy.value];
+
+    // Ensure string comparison is case-insensitive
+    if (typeof valA === "string") valA = valA.toLowerCase();
+    if (typeof valB === "string") valB = valB.toLowerCase();
+
+    if (valA < valB) return sortOrder.value === "asc" ? -1 : 1;
+    if (valA > valB) return sortOrder.value === "asc" ? 1 : -1;
+    return 0;
   });
 });
 
@@ -118,7 +146,6 @@ function addToCart(lesson) {
   if (lesson.spaces === 0) return;
 
   lesson.spaces--;
-
   cart.value.push({
     subject: lesson.subject,
     price: lesson.price,
@@ -129,66 +156,24 @@ function addToCart(lesson) {
 // REMOVE FROM CART
 function removeFromCart(index) {
   const removed = cart.value.splice(index, 1)[0];
-
-  // restore space to the proper lesson
-  const lesson = lessons.value.find(
-    (l) => l.subject === removed.subject && l.location === removed.location
+  const lesson = lessons.value.find(l => 
+    l.subject === removed.subject && l.location === removed.location
   );
-
   if (lesson) lesson.spaces++;
 }
 </script>
 
 <style scoped>
-#app {
-  font-family: Arial, sans-serif;
-  padding: 20px;
-}
-.app-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #ccc;
-  padding-bottom: 10px;
-}
-.search-bar {
-  margin-bottom: 15px;
-}
-.search-input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #aaa;
-  border-radius: 6px;
-}
-h2 {
-  border-bottom: 2px solid #4CAF50;
-  padding-bottom: 5px;
-  margin-bottom: 20px;
-}
-.lesson-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
-}
-.lesson-card {
-  border: 1px solid #ddd;
-  padding: 15px;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-.lesson-icon {
-  font-size: 2.5em;
-}
-.remove-btn {
-  background-color: #f44336;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  margin-top: 5px;
-  border-radius: 4px;
-}
+#app { font-family: Arial, sans-serif; padding: 20px; }
+.app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
+.search-input { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #aaa; margin-bottom: 15px; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 15px; }
+.sort-controls { display: flex; gap: 10px; align-items: center; }
+h2 { border-bottom: 2px solid #4CAF50; padding-bottom: 5px; margin-bottom: 20px; }
+.lesson-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px; }
+.lesson-card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; }
+.lesson-icon { font-size: 2.5em; margin-bottom: 8px; }
+.remove-btn { background-color: #f44336; color: white; border: none; padding: 6px 10px; margin-top: 5px; border-radius: 4px; }
+.add-to-cart-button { padding: 8px; background-color: #007bff; color: white; border: none; border-radius: 5px; }
+.add-to-cart-button[disabled] { background-color: #ccc; }
 </style>
