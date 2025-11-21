@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <header class="app-header">
-      <h1>Extra Class Lesson</h1>
+      <h1>Extra Class Lesson </h1>
 
       <button 
         @click="isCartVisible = !isCartVisible"
@@ -12,7 +12,7 @@
       </button>
     </header>
 
-    <!-- SEARCH & SORT CONTROLS -->
+    <!-- SEARCH & SORT -->
     <div v-if="!isCartVisible" class="controls">
       <input 
         v-model="searchQuery"
@@ -87,19 +87,39 @@
           <p><strong>Total Price:</strong> £{{ totalPrice.toFixed(2) }}</p>
         </div>
 
-        <!-- NEW: Checkout Form -->
+        <!-- Checkout Form with Validation -->
         <div class="checkout-form">
           <h3>Checkout</h3>
           <div class="form-group">
             <label for="name">Name:</label>
-            <input id="name" type="text" v-model="checkoutName" placeholder="Your Name" />
-          </div>
-          <div class="form-group">
-            <label for="phone">Phone:</label>
-            <input id="phone" type="tel" v-model="checkoutPhone" placeholder="Your Phone" />
+            <input 
+              id="name" 
+              type="text" 
+              v-model="checkoutName" 
+              placeholder="Your Name" 
+            />
+            <span v-if="checkoutName && !isNameValid" class="error">
+              Name must contain only letters and spaces.
+            </span>
           </div>
 
-          <button class="checkout-btn" :disabled="cart.length === 0 || !checkoutName || !checkoutPhone">
+          <div class="form-group">
+            <label for="phone">Phone:</label>
+            <input 
+              id="phone" 
+              type="tel" 
+              v-model="checkoutPhone" 
+              placeholder="Your Phone" 
+            />
+            <span v-if="checkoutPhone && !isPhoneValid" class="error">
+              Phone must contain only numbers.
+            </span>
+          </div>
+
+          <button 
+            class="checkout-btn" 
+            :disabled="!isCheckoutEnabled"
+          >
             Submit Order
           </button>
         </div>
@@ -152,8 +172,8 @@ const sortedAndFilteredLessons = computed(() => {
     let valB = b[sortBy.value];
     if (typeof valA === "string") valA = valA.toLowerCase();
     if (typeof valB === "string") valB = valB.toLowerCase();
-    if (valA < valB) return sortOrder.value === "asc" ? -1 : 1;
-    if (valA > valB) return sortOrder.value === "asc" ? 1 : -1;
+    if (valA < valB) return sortOrder.value === 'asc' ? -1 : 1;
+    if (valA > valB) return sortOrder.value === 'asc' ? 1 : -1;
     return 0;
   });
 });
@@ -186,6 +206,12 @@ const totalPrice = computed(() => {
 // CHECKOUT FORM
 const checkoutName = ref("");
 const checkoutPhone = ref("");
+
+// FORM VALIDATION
+const isNameValid = computed(() => /^[a-zA-Z\s]+$/.test(checkoutName.value));
+const isPhoneValid = computed(() => /^[0-9]+$/.test(checkoutPhone.value));
+
+const isCheckoutEnabled = computed(() => cart.value.length > 0 && isNameValid.value && isPhoneValid.value);
 </script>
 
 <style scoped>
@@ -207,4 +233,5 @@ h2 { border-bottom: 2px solid #4CAF50; padding-bottom: 5px; margin-bottom: 20px;
 .form-group { margin-bottom: 10px; }
 .checkout-btn { padding: 8px 12px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
 .checkout-btn:disabled { background-color: #aaa; cursor: not-allowed; }
+.error { color: red; font-size: 0.85em; }
 </style>
