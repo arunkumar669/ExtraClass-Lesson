@@ -3,7 +3,6 @@
     <header class="app-header">
       <h1>Extra Class Lesson</h1>
 
-      <!-- Toggle between Lessons and Cart -->
       <button 
         @click="isCartVisible = !isCartVisible"
         :disabled="cart.length === 0 && isCartVisible"
@@ -13,7 +12,7 @@
       </button>
     </header>
 
-    <!-- SEARCH & SORT CONTROLS -->
+    <!-- SEARCH & SORT -->
     <div v-if="!isCartVisible" class="controls">
       <input 
         v-model="searchQuery"
@@ -39,7 +38,6 @@
     <!-- LESSONS VIEW -->
     <main v-if="!isCartVisible" class="lessons-view">
       <div class="lesson-list">
-
         <div 
           v-for="lesson in sortedAndFilteredLessons" 
           :key="lesson.id" 
@@ -61,7 +59,6 @@
             {{ lesson.spaces === 0 ? 'Full' : 'Add to Cart' }}
           </button>
         </div>
-
       </div>
     </main>
 
@@ -82,6 +79,12 @@
           <button class="remove-btn" @click="removeFromCart(index)">
             Remove
           </button>
+        </div>
+
+        <!-- NEW: Cart Summary -->
+        <div class="cart-summary">
+          <p><strong>Total Items:</strong> {{ cart.length }}</p>
+          <p><strong>Total Price:</strong> £{{ totalPrice.toFixed(2) }}</p>
         </div>
       </div>
 
@@ -131,7 +134,6 @@ const sortedAndFilteredLessons = computed(() => {
     let valA = a[sortBy.value];
     let valB = b[sortBy.value];
 
-    // Ensure string comparison is case-insensitive
     if (typeof valA === "string") valA = valA.toLowerCase();
     if (typeof valB === "string") valB = valB.toLowerCase();
 
@@ -161,19 +163,25 @@ function removeFromCart(index) {
   );
   if (lesson) lesson.spaces++;
 }
+
+// NEW: Total price computed
+const totalPrice = computed(() => {
+  return cart.value.reduce((sum, item) => sum + item.price, 0);
+});
 </script>
 
 <style scoped>
 #app { font-family: Arial, sans-serif; padding: 20px; }
 .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
-.search-input { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #aaa; margin-bottom: 15px; }
 .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 15px; }
+.search-input { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #aaa; margin-bottom: 15px; }
 .sort-controls { display: flex; gap: 10px; align-items: center; }
 h2 { border-bottom: 2px solid #4CAF50; padding-bottom: 5px; margin-bottom: 20px; }
-.lesson-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px; }
+.lesson-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px; margin-top: 20px; }
 .lesson-card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; }
 .lesson-icon { font-size: 2.5em; margin-bottom: 8px; }
 .remove-btn { background-color: #f44336; color: white; border: none; padding: 6px 10px; margin-top: 5px; border-radius: 4px; }
 .add-to-cart-button { padding: 8px; background-color: #007bff; color: white; border: none; border-radius: 5px; }
 .add-to-cart-button[disabled] { background-color: #ccc; }
+.cart-summary { margin-top: 15px; padding: 10px; border-top: 1px solid #bbb; font-weight: bold; }
 </style>
