@@ -13,12 +13,22 @@
       </button>
     </header>
 
+    <!-- SEARCH BAR (NEW FOR COMMIT 3) -->
+    <div v-if="!isCartVisible" class="search-bar">
+      <input 
+        v-model="searchQuery"
+        type="text"
+        placeholder="Search by subject or location..."
+        class="search-input"
+      />
+    </div>
+
     <!-- LESSONS VIEW -->
     <main v-if="!isCartVisible" class="lessons-view">
       <div class="lesson-list">
 
         <div 
-          v-for="lesson in lessons" 
+          v-for="lesson in filteredLessons" 
           :key="lesson.id" 
           class="lesson-card"
         >
@@ -69,7 +79,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 // UPDATED LESSON DATA
 const lessons = ref([
@@ -88,11 +98,26 @@ const lessons = ref([
 const cart = ref([]);
 const isCartVisible = ref(false);
 
+// NEW: Search Query
+const searchQuery = ref("");
+
+// NEW: Computed filtered lessons
+const filteredLessons = computed(() => {
+  const query = searchQuery.value.toLowerCase();
+
+  return lessons.value.filter((lesson) => {
+    return (
+      lesson.subject.toLowerCase().includes(query) ||
+      lesson.location.toLowerCase().includes(query)
+    );
+  });
+});
+
 // ADD TO CART
 function addToCart(lesson) {
   if (lesson.spaces === 0) return;
 
-  lesson.spaces--; // reduce spaces
+  lesson.spaces--;
 
   cart.value.push({
     subject: lesson.subject,
@@ -105,7 +130,7 @@ function addToCart(lesson) {
 function removeFromCart(index) {
   const removed = cart.value.splice(index, 1)[0];
 
-  // restore spaces to the matching lesson
+  // restore space to the proper lesson
   const lesson = lessons.value.find(
     (l) => l.subject === removed.subject && l.location === removed.location
   );
@@ -127,9 +152,14 @@ function removeFromCart(index) {
   border-bottom: 2px solid #ccc;
   padding-bottom: 10px;
 }
-h1 {
-  font-size: 2.2em;
-  color: #333;
+.search-bar {
+  margin-bottom: 15px;
+}
+.search-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #aaa;
+  border-radius: 6px;
 }
 h2 {
   border-bottom: 2px solid #4CAF50;
@@ -146,39 +176,12 @@ h2 {
   border: 1px solid #ddd;
   padding: 15px;
   border-radius: 8px;
-  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
-}
-.lesson-details h3 {
-  color: #007bff;
 }
 .lesson-icon {
   font-size: 2.5em;
-  margin-bottom: 8px;
-}
-.cart-button {
-  padding: 10px 15px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-}
-.add-to-cart-button {
-  padding: 8px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-}
-.add-to-cart-button[disabled] {
-  background-color: #ccc;
-}
-.cart-item {
-  border-bottom: 1px dashed #bbb;
-  padding: 10px 0;
 }
 .remove-btn {
   background-color: #f44336;
