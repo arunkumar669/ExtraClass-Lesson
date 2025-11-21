@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <header class="app-header">
-      <h1>Extra Class Lesson </h1>
+      <h1>Extra Class Lesson</h1>
 
       <button 
         @click="isCartVisible = !isCartVisible"
@@ -87,7 +87,7 @@
           <p><strong>Total Price:</strong> £{{ totalPrice.toFixed(2) }}</p>
         </div>
 
-        <!-- Checkout Form with Validation -->
+        <!-- Checkout Form with Validation & Submission -->
         <div class="checkout-form">
           <h3>Checkout</h3>
           <div class="form-group">
@@ -119,9 +119,15 @@
           <button 
             class="checkout-btn" 
             :disabled="!isCheckoutEnabled"
+            @click="submitOrder"
           >
             Submit Order
           </button>
+
+          <!-- Success message -->
+          <p v-if="orderSuccess" class="success-message">
+            ✅ Order submitted successfully! Thank you, {{ checkoutName }}.
+          </p>
         </div>
 
       </div>
@@ -210,8 +216,30 @@ const checkoutPhone = ref("");
 // FORM VALIDATION
 const isNameValid = computed(() => /^[a-zA-Z\s]+$/.test(checkoutName.value));
 const isPhoneValid = computed(() => /^[0-9]+$/.test(checkoutPhone.value));
-
 const isCheckoutEnabled = computed(() => cart.value.length > 0 && isNameValid.value && isPhoneValid.value);
+
+// ORDER SUCCESS MESSAGE
+const orderSuccess = ref(false);
+
+// SUBMIT ORDER
+function submitOrder() {
+  if (!isCheckoutEnabled.value) return;
+
+  // Simulate saving order (here we just log)
+  console.log("Order submitted:", {
+    name: checkoutName.value,
+    phone: checkoutPhone.value,
+    items: cart.value
+  });
+
+  // Show success message
+  orderSuccess.value = true;
+
+  // Clear cart and form
+  cart.value = [];
+  checkoutName.value = "";
+  checkoutPhone.value = "";
+}
 </script>
 
 <style scoped>
@@ -234,4 +262,5 @@ h2 { border-bottom: 2px solid #4CAF50; padding-bottom: 5px; margin-bottom: 20px;
 .checkout-btn { padding: 8px 12px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
 .checkout-btn:disabled { background-color: #aaa; cursor: not-allowed; }
 .error { color: red; font-size: 0.85em; }
+.success-message { color: green; font-weight: bold; margin-top: 10px; }
 </style>
