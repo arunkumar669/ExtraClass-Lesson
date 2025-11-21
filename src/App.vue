@@ -15,7 +15,8 @@
     <!-- SEARCH & SORT -->
     <div v-if="!isCartVisible" class="controls">
       <input 
-        v-model="searchQuery"
+        :value="searchQuery"
+        @input="debouncedSearch"
         type="text"
         placeholder="Search by subject or location..."
         class="search-input"
@@ -159,8 +160,9 @@ const isCartVisible = ref(false);
 const searchQuery = ref("");
 const sortBy = ref("subject");
 const sortOrder = ref("asc");
+let searchTimeout = null;
 
-// FILTERED & SORTED LESSONS
+// FILTERED LESSONS WITH DEBOUNCE
 const filteredLessons = computed(() => {
   const query = searchQuery.value.toLowerCase();
   return lessons.value.filter(lesson => 
@@ -168,6 +170,8 @@ const filteredLessons = computed(() => {
     lesson.location.toLowerCase().includes(query)
   );
 });
+
+// SORTED AND FILTERED LESSONS
 const sortedAndFilteredLessons = computed(() => {
   return [...filteredLessons.value].sort((a, b) => {
     let valA = a[sortBy.value];
@@ -179,6 +183,15 @@ const sortedAndFilteredLessons = computed(() => {
     return 0;
   });
 });
+
+// DEBOUNCE FUNCTION
+function debouncedSearch(event) {
+  clearTimeout(searchTimeout);
+  const value = event.target.value;
+  searchTimeout = setTimeout(() => {
+    searchQuery.value = value;
+  }, 300);
+}
 
 // ADD TO CART
 function addToCart(lesson) {
@@ -223,7 +236,6 @@ function submitOrder() {
     phone: checkoutPhone.value,
     items: cart.value
   });
-
   orderSuccess.value = true;
   cart.value = [];
   checkoutName.value = "";
@@ -238,8 +250,6 @@ watch(cart, (newCart) => {
 onMounted(() => {
   const storedCart = JSON.parse(localStorage.getItem('lessonCart') || '[]');
   cart.value = storedCart;
-
-  // Reduce lesson spaces based on stored cart
   storedCart.forEach(item => {
     const lesson = lessons.value.find(l => 
       l.subject === item.subject && l.location === item.location
