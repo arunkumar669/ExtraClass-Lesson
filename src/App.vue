@@ -113,7 +113,7 @@ export default {
   name: "App",
   data() {
     return {
-      API_BASE: "http://localhost:3000",
+      API_BASE: "https://extra-classes-backend.onrender.com",
       lessons: [],
       sortBy: "subject",
       sortOrder: "asc",
