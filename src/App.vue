@@ -40,7 +40,7 @@
       <div class="lesson-grid">
         <div v-for="lesson in sortedAndFilteredLessons" :key="lesson._id" class="lesson-card">
           <!-- IMAGE AT TOP -->
-          <img :src="API_BASE + lesson.imageUrl" :alt="lesson.subject" class="lesson-image">
+          <img :src="$api + lesson.image" :alt="lesson.subject" class="lesson-image">
 
           <div class="lesson-details-side">
             <h3><i :class="lesson.icon"></i> {{ lesson.subject }}</h3>
@@ -111,9 +111,9 @@
 <script>
 export default {
   name: "App",
+  
   data() {
     return {
-      API_BASE: "https://extra-classes-backend.onrender.com",
       lessons: [],
       sortBy: "subject",
       sortOrder: "asc",
@@ -129,6 +129,7 @@ export default {
       orderError: ""
     };
   },
+
   computed: {
     isNameValid() {
       return /^[a-zA-Z\s]+$/.test(this.nameInput);
@@ -166,6 +167,7 @@ export default {
       return sorted;
     }
   },
+
   methods: {
     debouncedSearch(event) {
       clearTimeout(this.searchTimeout);
@@ -174,6 +176,7 @@ export default {
         this.searchInput = value;
       }, 300);
     },
+
     addToCart(lesson) {
       const cartItem = this.cart.find(item => item.lessonId === lesson._id);
       if (cartItem) {
@@ -191,9 +194,11 @@ export default {
       this.orderSubmitted = false;
       this.orderError = "";
     },
+
     removeFromCart(index) {
       this.cart.splice(index, 1);
     },
+
     async checkoutOrder() {
       if (!this.isCheckoutEnabled) return;
 
@@ -210,7 +215,7 @@ export default {
           }))
         };
 
-        const res = await fetch(`${this.API_BASE}/orders`, {
+        const res = await fetch(`${this.$api}/orders`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
@@ -223,39 +228,38 @@ export default {
           return;
         }
 
-        // Show success message
         this.orderSubmitted = true;
         this.orderNameConfirmation = this.nameInput;
         this.orderError = "";
 
-        // Reset cart and form
         this.cart = [];
         this.nameInput = "";
         this.phoneInput = "";
 
-        // Refresh lessons
         await this.fetchLessons();
 
-        // Automatically return to lessons view after 3 seconds
         setTimeout(() => {
           this.currentView = "lessons";
-          this.orderSubmitted = false; // hide message after switching
+          this.orderSubmitted = false;
         }, 3000);
 
       } catch (err) {
         this.orderError = "Network error";
       }
     },
+
     async fetchLessons() {
-      const res = await fetch(`${this.API_BASE}/lessons`);
+      const res = await fetch(`${this.$api}/lessons`);
       this.lessons = await res.json();
     }
   },
+
   mounted() {
     this.fetchLessons();
   }
 };
 </script>
+
 
 <style>
 #app {
