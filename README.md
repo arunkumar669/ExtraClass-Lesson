@@ -1,47 +1,40 @@
-Extra Class Lessons App
+# Extra Class Lessons App
 
-This project is a simple Vue.js application that allows users to browse lessons, add them to a cart, and complete an order.
+This project is a Vue.js application that allows users to browse lessons, add them to a cart, and complete an order. It includes searching, sorting, cart management, form validation, and communication with a backend API.
 
-Main Features:
+## Features
+- Load lessons from the backend API
+- Search lessons by subject, location, price, or spaces
+- Sort lessons by subject, location, price, or spaces
+- Add lessons to the cart (spaces decrease automatically)
+- Remove lessons from the cart (spaces increase back)
+- Checkout form with name and phone validation
+- Submit orders to the backend
 
-Load lessons from the backend API
+## How to Run
+1. Install dependencies:
+   npm install
 
-Search lessons by subject, location, price, or spaces
+2. Start the development server:
+   npm run serve
 
-Sort lessons by subject, location, price, or spaces
+3. Build the production version:
+   npm run build
 
-Add lessons to the cart (spaces decrease automatically)
-
-Remove items from the cart (spaces increase back)
-
-Simple checkout form with name and phone validation
-
-Submit orders to the backend
-
-How to Run:
-
-Install all dependencies using: npm install
-
-Start the development server using: npm run serve
-
-Build the production version using: npm run build
-
-API Used:
-GET /lessons - returns all lessons
+## API Endpoints
+GET /lessons - returns all lessons  
 POST /orders - sends the order information
 
-Validation:
-Name must contain letters and spaces only.
-Phone must contain numbers only.
-Checkout button is disabled until the form is valid and the cart is not empty.
+## Validation
+- Name must contain letters and spaces only
+- Phone must contain numbers only
+- Checkout button is enabled only when the form is valid and cart is not empty
 
-Configuration:
-Set the API base link in your Vue app using this.$api.
+## Configuration
+Set your API link in your Vue app using:
+this.$api
 
-Project Contents:
-
-App.vue: main application file
-
-main.js: app entry point
-
-public/index.html: main HTML file
+## Project Contents
+- App.vue: main application file
+- main.js: app entry point
+- public/index.html: main HTML file
