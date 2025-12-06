@@ -42,7 +42,6 @@
           <!-- IMAGE AT TOP -->
           <img :src="$api + lesson.image" :alt="lesson.subject" class="lesson-image">
 
-
           <div class="lesson-details-side">
             <h3><i :class="lesson.icon"></i> {{ lesson.subject }}</h3>
             <p>📍 Location: {{ lesson.location }}</p>
@@ -179,7 +178,10 @@ export default {
     },
 
     addToCart(lesson) {
+      if (lesson.spaces <= 0) return; // Prevent adding if fully booked
+
       const cartItem = this.cart.find(item => item.lessonId === lesson._id);
+
       if (cartItem) {
         cartItem.quantity += 1;
       } else {
@@ -188,15 +190,28 @@ export default {
           subject: lesson.subject,
           price: Number(lesson.price),
           location: lesson.location,
-          quantity: 1
+          quantity: 1,
+          lessonRef: lesson // reference to original lesson
         });
       }
+
+      // Decrease the available spaces
+      lesson.spaces -= 1;
 
       this.orderSubmitted = false;
       this.orderError = "";
     },
 
     removeFromCart(index) {
+      const cartItem = this.cart[index];
+
+      // Restore spaces to the original lesson
+      const originalLesson = this.lessons.find(l => l._id === cartItem.lessonId);
+      if (originalLesson) {
+        originalLesson.spaces += cartItem.quantity;
+      }
+
+      // Remove item from cart
       this.cart.splice(index, 1);
     },
 
@@ -260,7 +275,6 @@ export default {
   }
 };
 </script>
-
 
 <style>
 #app {
@@ -430,5 +444,3 @@ header {
   opacity:0.9;
 }
 </style>
-
-

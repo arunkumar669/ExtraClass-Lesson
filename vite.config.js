@@ -1,18 +1,14 @@
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import vueDevTools from 'vite-plugin-vue-devtools'
 
-// https://vite.dev/config/
+// Set base to './' so it works both locally and on GitHub Pages
 export default defineConfig({
-  base: '/ExtraClass-Lesson/', // 🔥 important for GitHub Pages
-  plugins: [
-    vue(),
-    vueDevTools(),
-  ],
+  base: './',
+  plugins: [vue()],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
 })

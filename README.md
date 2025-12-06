@@ -1,38 +1,47 @@
-# vue-project
+Extra Class Lessons App
 
-This template should help get you started developing with Vue 3 in Vite.
+This project is a simple Vue.js application that allows users to browse lessons, add them to a cart, and complete an order.
 
-## Recommended IDE Setup
+Main Features:
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+Load lessons from the backend API
 
-## Recommended Browser Setup
+Search lessons by subject, location, price, or spaces
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) 
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+Sort lessons by subject, location, price, or spaces
 
-## Customize configuration
+Add lessons to the cart (spaces decrease automatically)
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+Remove items from the cart (spaces increase back)
 
-## Project Setup
+Simple checkout form with name and phone validation
 
-```sh
-npm install
-```
+Submit orders to the backend
 
-### Compile and Hot-Reload for Development
+How to Run:
 
-```sh
-npm run dev
-```
+Install all dependencies using: npm install
 
-### Compile and Minify for Production
+Start the development server using: npm run serve
 
-```sh
-npm run build
-```
+Build the production version using: npm run build
+
+API Used:
+GET /lessons - returns all lessons
+POST /orders - sends the order information
+
+Validation:
+Name must contain letters and spaces only.
+Phone must contain numbers only.
+Checkout button is disabled until the form is valid and the cart is not empty.
+
+Configuration:
+Set the API base link in your Vue app using this.$api.
+
+Project Contents:
+
+App.vue: main application file
+
+main.js: app entry point
+
+public/index.html: main HTML file
