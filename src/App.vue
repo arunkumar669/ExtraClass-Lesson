@@ -276,6 +276,7 @@ export default {
 };
 </script>
 
+
 <style>
 #app {
   font-family: Arial, sans-serif;
